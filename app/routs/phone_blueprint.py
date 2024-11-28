@@ -61,9 +61,9 @@ def get_info_on_direct_connection_between_two_devices():
     }), 200
 
 
-@phone_bp.route("/get-recent-info-for-device-sorted-by-timestamp", methods=['GET'])
-def get_recent_info_for_device_sorted_by_timestamp():
+@phone_bp.route("/get-recent-info-for-device-sorted-by-timestamp/<device_id>", methods=['GET'])
+def get_recent_info_for_device_sorted_by_timestamp(device_id):
     tracker = PhoneTracker(neo4j_driver)
-    connections = tracker.get_recent_info_sorted_by_timestamp()
+    connections = tracker.get_recent_info_sorted_by_timestamp(device_id)
     return jsonify({"connections": connections}), 200
 
