@@ -68,6 +68,7 @@ class PhoneTracker:
                 d1.id AS from_device, 
                 d2.id AS to_device, 
                 length(path) AS path_length
+            ORDER BY length(path) DESC
             """
             result = session.run(query)
             return [
@@ -77,3 +78,30 @@ class PhoneTracker:
                     "path_length": record["path_length"]
                 } for record in result
             ]
+    def get_all_devices_strength_stronger_than_60(self):
+        with self.driver.session() as session:
+            query = """
+                    MATCH path = (d1:Device)-[r:CONNECTED]->(d2:Device)
+                    WHERE r.signal_strength_dbm > -60
+                    RETURN
+                        d1.id AS from_device,
+                        d2.id AS to_device,
+                        r.signal_strength_dbm AS signal_strength
+                    """
+            result = session.run(query)
+            return [
+                {
+                    "from_device": record["from_device"],
+                    "to_device": record["to_device"],
+                    "signal_strength": record["signal_strength"]
+                } for record in result
+            ]
+
+    def count_device_connections(self,device_id):
+        with self.driver.session() as session:
+            query = """
+            MATCH (d:Device {id: $device_id})-[r:CONNECTED]->()
+            RETURN count(r) AS connection_count
+            """
+            result = session.run(query, {"device_id": device_id}).single()
+            return result["connection_count"] if result else 0
