@@ -34,14 +34,18 @@ def get_all_devices_connecting_by_bluetooth():
     connections = tracker.get_all_bluetooth_connections()
     return jsonify({"connections": connections}), 200
 
-# @phone_bp.route("/", methods=['GET'])
-# def get_all_devices_with_strength_stronger_than_60():
-#    pass
-#
-# @phone_bp.route("/", methods=['GET'])
-# def get_count_of_all_devices_connected_to_device_by_id(device_id):
-#    pass
-#
+@phone_bp.route("/get-all-devices-with-strength-stronger-than_60", methods=['GET'])
+def get_all_devices_with_strength_stronger_than_60():
+    tracker = PhoneTracker(neo4j_driver)
+    connections = tracker.get_all_bluetooth_connections()
+    return jsonify({"connections": connections}), 200
+
+@phone_bp.route("/get-count-of-all-devices-connected-to-device-by-id/<device_id>", methods=['GET'])
+def get_count_of_all_devices_connected_to_device_by_id(device_id):
+    tracker = PhoneTracker(neo4j_driver)
+    count = tracker.count_device_connections(device_id)
+    return jsonify({"device_id": device_id, "connection_count": count}), 200
+
 # @phone_bp.route("/", methods=['GET'])
 # def get_info_on_direct_connection_between_two_devices():
 #    pass
