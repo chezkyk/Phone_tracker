@@ -30,8 +30,9 @@ def get_interaction():
 
 @phone_bp.route("/api/get-all-devices-connecting-by-bluetooth", methods=['GET'])
 def get_all_devices_connecting_by_bluetooth():
+    max_depth = int(request.args.get('max_depth', 4))
     tracker = PhoneTracker(neo4j_driver)
-    connections = tracker.get_all_bluetooth_connections()
+    connections = tracker.get_all_bluetooth_connections(max_depth)
     return jsonify({"connections": connections}), 200
 
 @phone_bp.route("/get-all-devices-with-strength-stronger-than_60", methods=['GET'])

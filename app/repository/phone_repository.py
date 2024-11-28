@@ -60,16 +60,18 @@ class PhoneTracker:
 
                 session.run(query_create_interaction, interaction_params)
 
-    def get_all_bluetooth_connections(self):
+    def get_all_bluetooth_connections(self,max_depth=4):
         with self.driver.session() as session:
             query = """
-            MATCH path = (d1:Device)-[r:CONNECTED {method: 'Bluetooth'}]->(d2:Device)
+            MATCH path = (d1:Device)-[r:CONNECTED*1..%d {method: 'Bluetooth'}]->(d2:Device)
+            WHERE d1 <> d2
             RETURN 
                 d1.id AS from_device, 
                 d2.id AS to_device, 
                 length(path) AS path_length
-            ORDER BY length(path) DESC
-            """
+            ORDER BY path_length DESC
+            """ % max_depth
+
             result = session.run(query)
             return [
                 {
