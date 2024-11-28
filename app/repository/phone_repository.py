@@ -125,5 +125,20 @@ class PhoneTracker:
             }).single()
             return result["is_connected"] if result else False
 
-    def get_recent_info_sorted_by_timestamp(self):
-        pass
+    def get_recent_info_sorted_by_timestamp(self,device_id):
+        with self.driver.session() as session:
+            query = """
+            MATCH (d1:Device {id: $device_id})-[r:CONNECTED]->(d2:Device)
+            RETURN
+                d2.id AS connected_device,
+                r.method AS method,
+                r.bluetooth_version AS bluetooth_version,
+                r.signal_strength_dbm AS signal_strength,
+                r.distance_meters AS distance,
+                r.duration_seconds AS duration,
+                r.timestamp AS timestamp
+            ORDER BY r.timestamp DESC
+            LIMIT 1
+            """
+            result = session.run(query, {"device_id": device_id}).single()
+            return dict(result) if result else None
